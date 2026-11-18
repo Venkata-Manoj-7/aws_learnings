@@ -1,12 +1,16 @@
-
 {
   "name": "aws-lamda-order",
   "version": "1.0.0",
   "description": "AWS Lambda REST API for order management using DynamoDB",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "jest"
+  },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1169.0"
   },
-  "type": "commonjs"
+  "type": "commonjs",
+  "devDependencies": {
+    "jest": "^30.5.2"
+  }
 }
