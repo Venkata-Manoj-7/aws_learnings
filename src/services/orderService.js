@@ -13,9 +13,11 @@ function formatOrder(item) {
     }
 
     return {
-        orderId: Number(item.orderId.N),
-        product: item.product.S,
-        quantity: Number(item.quantity.N)
+        orderId: item.orderId?.N ? Number(item.orderId.N) : null,
+        product: item.product?.S ?? null,
+        quantity: item.quantity?.N ? Number(item.quantity.N) : null,
+        unitPrice: item.unitPrice?.N ? Number(item.unitPrice.N) : null,
+        totalPrice: item.totalPrice?.N ? Number(item.totalPrice.N) : null
     };
 }
 
@@ -24,11 +26,13 @@ async function createOrder(order) {
 
     const command = new PutItemCommand({
         TableName: "Orders",
-         ConditionExpression: "attribute_not_exists(orderId)",
+        ConditionExpression: "attribute_not_exists(orderId)",
         Item: {
             orderId: { N: String(order.orderId) },
             product: { S: order.product.trim() },
-            quantity: { N: String(order.quantity) }
+            quantity: { N: String(order.quantity) },
+            unitPrice: { N: String(order.unitPrice) },
+            totalPrice: { N: String(order.totalPrice) }
         }
     });
 
@@ -59,10 +63,12 @@ async function updateOrder(orderId, order) {
             orderId: { N: String(orderId) }
         },
         UpdateExpression:
-            "SET product = :product, quantity = :quantity",
+            "SET product = :product, quantity = :quantity, unitPrice = :unitPrice, totalPrice = :totalPrice",
         ExpressionAttributeValues: {
             ":product": { S: order.product.trim() },
-            ":quantity": { N: String(order.quantity) }
+            ":quantity": { N: String(order.quantity) },
+            ":unitPrice": { N: String(order.unitPrice) },
+            ":totalPrice": { N: String(order.totalPrice) }
         },
         ConditionExpression: "attribute_exists(orderId)",
         ReturnValues: "ALL_NEW"

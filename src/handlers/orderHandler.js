@@ -1,4 +1,32 @@
 const {
+    LambdaClient,
+    InvokeCommand
+} = require("@aws-sdk/client-lambda");
+
+const lambdaClient = new LambdaClient({
+    region: "eu-north-1"
+});
+async function calculatePrice(product, quantity) {
+        const command = new InvokeCommand({
+        FunctionName: "arn:aws:lambda:eu-north-1:547621305273:function:PriceCalculationLambda",
+        InvocationType: "RequestResponse",
+
+        Payload: Buffer.from(JSON.stringify({
+            product,
+            quantity
+        }))
+    });
+    const response = await lambdaClient.send(command);
+    const result = JSON.parse(
+        Buffer.from(response.Payload).toString()
+    );
+    if (response.FunctionError) {
+        throw new Error(result.errorMessage || "Price calculation failed");
+    }
+    return result;
+}
+
+const {
     createOrder,
     getOrder,
     updateOrder,
@@ -68,11 +96,21 @@ async function handler(event) {
                 return errorResponse(400, validationError);
             }
 
-            await createOrder(order);
+        // Invoke PriceCalculationLambda
+          const priceDetails = await calculatePrice(
+                order.product.trim(),
+                  order.quantity
+                );
+          order.unitPrice = priceDetails.unitPrice;
+         order.totalPrice = priceDetails.totalPrice;
+await createOrder(order);
 
             return successResponse(201, {
                 orderId: order.orderId,
                 product: order.product.trim(),
+                quantity: order.quantity,
+               unitPrice: order.unitPrice,
+               totalPrice: order.totalPrice,
                 message: "Order created successfully"
             });
         }
@@ -96,8 +134,14 @@ async function handler(event) {
             if (validationError) {
                 return errorResponse(400, validationError);
             }
-
-            const updatedOrder = await updateOrder(orderId, order);
+            // Invoke PriceCalculationLambda
+              const priceDetails = await calculatePrice(
+                    order.product.trim(),
+                    order.quantity
+                 );
+                 order.unitPrice = priceDetails.unitPrice;
+                 order.totalPrice = priceDetails.totalPrice;
+                const updatedOrder = await updateOrder(orderId, order);
 
             return successResponse(200, {
                 message: "Order updated successfully",
