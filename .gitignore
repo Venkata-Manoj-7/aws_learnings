@@ -152,5 +152,10 @@ vite.config.ts.timestamp-*
 # AWS deployment package
 function.zip
 
-# Project-specific exclusions
-package-lock.json
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
