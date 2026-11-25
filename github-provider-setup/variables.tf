@@ -7,7 +7,7 @@ variable "repo_name" {
 variable "repo_description" {
   type        = string
   description = "Short description shown on the GitHub repo"
-  default     = "Provisioned and managed by Terraform"
+  default     = "Updated in-place via Terraform without recreating!"
 }
 
 variable "visibility" {

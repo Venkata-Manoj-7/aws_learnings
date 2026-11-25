@@ -13,4 +13,24 @@ output "repo_ssh_clone_url" {
   value       = github_repository.demo_repo.ssh_clone_url
 }
 
+// --------------------------------------------------------
 
+output "auth_usernmae" {
+  value = data.github_user.current.login
+}
+
+output "auth_profile_url" {
+  value = "https://github.com/${data.github_user.current.login}"
+
+
+}
+
+/*output "demo_issue_output" {
+  description = "Demo issue output details"
+  value = {
+    created_by = data.github_user.current.login
+    repo_name  = github_repository.demo_repo.name
+    issue_num  = github_issue.demo_issue.number
+    issue_url  = "${github_repository.demo_repo.html_url}/issues/${github_issue.demo_issue.number}"
+  }
+}*/
